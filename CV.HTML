@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>كرم علي فاروق السعودي | Interactive 3D Portfolio</title>
+    <!-- Google Fonts & Three.js -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --accent: #06b6d4;
+            --bg-dark: #060911;
+            --card-bg: rgba(15, 23, 42, 0.75);
+            --border: rgba(255, 255, 255, 0.15);
+            --text-main: #f8fafc;
+            --text-muted: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Cairo', 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* 3D Canvas Background */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* App Container */
+        .app-container {
+            position: relative;
+            z-index: 2;
+            max-width: 1150px;
+            margin: 0 auto;
+            padding: 25px 20px;
+        }
+
+        /* Header Navigation */
+        header {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            padding: 18px 30px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 35px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 10px 22px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-color: var(--accent);
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .lang-btn {
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            border: none;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        /* Interactive 3D Cards */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 35px;
+            margin-bottom: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            perspective: 1000px;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-6px) rotateX(1.5deg) rotateY(-1.5deg);
+            border-color: rgba(6, 182, 212, 0.6);
+            box-shadow: 0 25px 45px rgba(6, 182, 212, 0.2);
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.6s ease forward;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { font-size: 2.3rem; margin-bottom: 8px; font-weight: 800; }
+        h2 { font-size: 1.35rem; color: var(--accent); margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 10px; font-weight: 700; }
+        p { color: var(--text-muted); font-size: 0.98rem; line-height: 1.8; margin-bottom: 12px; }
+
+        .interactive-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 1px dashed var(--accent);
+            padding-bottom: 2px;
+        }
+
+        .interactive-link:hover {
+            color: #ffffff;
+            border-bottom-style: solid;
+            text-shadow: 0 0 10px var(--accent);
+        }
+
+        /* Tech Competencies Cards */
+        .skills-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-top: 15px;
+        }
+
+        .skill-card-3d {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 16px;
+        }
+
+
+/* --- أكواد التجاوب للأجهزة المختلفة --- */
+
+/* للهواتف المحمولة (الشاشات الصغيرة) */
+@media (max-width: 768px) {
+    .app-container {
+        padding: 15px 10px;
+    }
+
+    header {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+        text-align: center;
+    }
+
+    .nav-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .nav-btn, .Lang-btn {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+        flex: 1 1 auto;
+    }
+
+    .glass-card {
+        padding: 20px 15px;
+    }
+
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    h2 {
+        font-size: 1.15rem;
+    }
+
+    .skills-container {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px;
+    }
+}
+
+/* للأجهزة اللوحية (الأيباد) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .app-container {
+        max-width: 90%;
+        padding: 20px;
+    }
+
+    .skills-container {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+}
+
+
+
+        .skill-card-3d:hover {
+            background: rgba(37, 99, 235, 0.15);
+            border-color: var(--accent);
+            transform: translateY(-4px);
+        }
+
+        .skill-card-3d h3 {
+            font-size: 1.05rem;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .skill-card-3d p {
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        /* Gallery Grid & Lightbox */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        .gallery-item {
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gallery-item:hover {
+            border-color: var(--accent);
+            background: rgba(6, 182, 212, 0.12);
+            transform: scale(1.04);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        /* Modal Lightbox */
+        .lightbox-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(5, 8, 15, 0.92);
+            backdrop-filter: blur(12px);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .lightbox-modal.active {
+            display: flex;
+        }
+
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 85vh;
+            border-radius: 16px;
+            box-shadow: 0 0 50px rgba(6, 182, 212, 0.5);
+            border: 1px solid var(--border);
+        }
+
+        .close-lightbox {
+            position: absolute;
+            top: 25px;
+            right: 35px;
+            font-size: 2.2rem;
+            color: #ffffff;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+    </style>
+
+    <meta http-equiv="X-Frame-Options" content="DENY">
+
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+
+<meta http-equiv="X-XSS-Protection" content="1; mode=block">
+
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+</head>
+<body>
+
+    <!-- 3D Canvas Container -->
+    <div id="canvas-container"></div>
+
+    <!-- App Overlay -->
+    <div class="app-container">
+        
+        <!-- Navigation Header -->
+        <header>
+            <div class="logo">كرم علي فاروق السعودي</div>
+            <div class="nav-controls">
+                <button class="nav-btn active" onclick="switchPage('cv')" id="btn-cv">الـ CV </button>
+                <button class="nav-btn" onclick="switchPage('resume')" id="btn-resume">السيرة الذاتية </button>
+                <button class="nav-btn lang-btn" onclick="toggleLanguage()" id="btn-lang">English</button>
+            </div>
+        </header>
+
+        <!-- PAGE 1: CV (Comprehensive First-Person) -->
+        <div id="page-cv" class="page active">
+            <div class="glass-card">
+                <h1 id="cv-name">كرم علي فاروق السعودي</h1>
+                <p id="cv-title" style="color: var(--accent); font-weight: 700; font-size: 1.15rem;">متخرج تكنولوجيا المعلومات بالنظام البريطاني</p>
+                <p id="cv-contact-details">
+                    عمان الأردن &nbsp;|&nbsp; 
+                    <a href="mailto:karamalsaudi08@gmail.com" class="interactive-link">karamalsaudi08@gmail.com</a> &nbsp;|&nbsp; 
+                    هاتف: 0781575577 &nbsp;|&nbsp; 
+                    معرض مشاريعي: <a href="https://github.com/karamalsaudi" target="_blank" class="interactive-link">github.com/karamalsaudi</a>
+                </p>
+            </div>
+
+            <div class="glass-card">
+                <h2 id="cv-exp-title">الخبرات الشاملة والتأهيل الأكاديمي والتقني الخاص بي</h2>
+                <p id="cv-exp-body">
+                    أنا كرم السعودي أمتلك خلفية علمية وتقنية متقدمة تم بناء وتطوير خبراتي فيها من خلال مسار دبلوم بيرسون BTEC الدولي بنجاح متميز وبمعدل 83.80 بالمئة مع حصولي على العلامة الكاملة 100 بالمئة في معظم المواد التخصصية المعقدة لقد قمت بتعزيز معرفتي العملية في مجالات الأمن السيبراني البرمجة تطوير الألعاب الدعم الفني إدارة المشاريع الذكاء الاصطناعي وتطوير المواقع وتكللت هذه المسيرة الشغوفة بفضله تعالى بتحقيقي المركز الأول على مستوى المملكة الأردنية الهاشمية في مسابقة تطوير الألعاب Godot Game Jam لعام 2025 مما يبرهن قدرتي العالية على ابتكار الحلول البرمجية والعمل تحت الضغط وإدارة المنطق البرمجي بكفاءة متناهية
+                </p>
+            </div>
+
+            <div class="glass-card">
+                <h2 id="cv-skills-title">قدراتي ومهاراتي التقنية المتقدمة</h2>
+                <div class="skills-container">
+                    <div class="skill-card-3d">
+                        <h3 id="sk1-t">الدعم الفني والأنظمة</h3>
+                        <p id="sk1-d">أمتلك مهارة عالية في تشخيص وإصلاح مشاكل العتاد والبرمجيات وإدارة شبكات الاتصال وضمان مطابقة الأنظمة لبيئات ITSM</p>
+                    </div>
+                    <div class="skill-card-3d">
+                        <h3 id="sk2-t">الأمن السيبراني والحوكمة</h3>
+                        <p id="sk2-d">أجيد التعامل مع الحوادث الأمنية وفهم مبادئ التشفير والحماية المتقدمة وتطبيق معايير ISO 27001 وقواعد البيانات SQL</p>
+                    </div>
+                    <div class="skill-card-3d">
+                        <h3 id="sk3-t">البرمجة وتطوير الويب</h3>
+                        <p id="sk3-d">أبرمج بثبات باستخدام لغات Python و JavaScript وأقوم ببناء واجهات تفاعلية جليلة بـ HTML5 و CSS3 مع معرفة بـ C++</p>
+                    </div>
+                    <div class="skill-card-3d">
+                        <h3 id="sk4-t">تطوير الألعاب وأدوات التحكم</h3>
+                        <p id="sk4-d">أطور المنطق التفاعلي للألعاب على محرك Godot وأدير بيئات العمل البرمجية باستخدام Git و Visual Studio و GitHub Pages</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <h2 id="cv-edu-title">سجلي الأكاديمي الموثق والدرجات التي حققتها</h2>
+                <p id="cv-edu-body">حصلت على شهادة الدراسة الثانوية العامة مسار BTEC تقنية المعلومات من مدرسة رغدان الثانوية للبنين بمجموع كلي 838 من 1000</p>
+                <p id="cv-units-title" style="color: var(--accent); font-weight: 700; margin-top: 10px;">نتائجي التفصيلية في المواد المعتمدة</p>
+                <p id="cv-units-list">
+                    الأمن السيبراني وإدارة الحوادث 100 بالمئة &nbsp;|&nbsp; 
+                    البرمجة 100 بالمئة &nbsp;|&nbsp; 
+                    الدعم الفني وإدارة تقنية المعلومات 100 بالمئة &nbsp;|&nbsp; 
+                    تطوير المواقع الإلكترونية 100 بالمئة &nbsp;|&nbsp; 
+                    تطوير ألعاب الكمبيوتر 100 بالمئة &nbsp;|&nbsp; 
+                    إدارة مشاريع تقنية المعلومات 100 بالمئة &nbsp;|&nbsp; 
+                    مقدمة في الذكاء الاصطناعي 100 بالمئة &nbsp;|&nbsp; 
+                    استراتيجية وبنية الأنظمة 80 بالمئة
+                </p>
+            </div>
+        </div>
+
+        <!-- PAGE 2: RESUME (Executive First-Person) -->
+        <div id="page-resume" class="page">
+            <div class="glass-card">
+                <h1 id="res-name">كرم علي فاروق السعودي</h1>
+                <p id="res-title" style="color: var(--accent); font-weight: 700; font-size: 1.15rem;">مساعد عمليات تقنية المعلومات والبرمجيات</p>
+                <p id="res-contact">
+                    عمان الأردن &nbsp;|&nbsp; 
+                    <a href="mailto:karamalsaudi08@gmail.com" class="interactive-link">karamalsaudi08@gmail.com</a> &nbsp;|&nbsp; 
+                    هاتف: 0781575577
+                </p>
+            </div>
+
+            <div class="glass-card">
+                <h2 id="res-exec-title">ملفي التنفيذي المهني</h2>
+                <p id="res-exec-text">
+                    أنا خريج تقني متخصص ومؤهل بدبلوم بيرسون BTEC الدولي ومزود بإنجاز وطني حقيقي على مستوى المملكة الأردنية الهاشمية أحمل جاهزية كاملة لتقديم قيمة عملية فورية ومباشرة في مجالات الدعم الفني التشغيلي تطوير الويب وإدارة البنية التحتية التقنية أتمتع بفهم عميق لأطر العمل العالمية مثل إدارة خدمات تقنية المعلومات ITSM وقواعد حوكمة وأمن المعلومات وفق معايير ISO 27001 أملك الشغف الدائم لتطوير الأنظمة وإصلاح أعطالها المعقدة والمساهمة الفعالة في تحقيق أهداف فرق العمل البرمجية والتشغيلية
+                </p>
+            </div>
+
+            <div class="glass-card">
+                <h2 id="res-achieve-title">إنجازاتي والمسابقات والمشاريع التي نفذتها</h2>
+                <p><strong id="res-jam-t">حصولي على المركز الأول على مستوى المملكة في مسابقة Godot Game Jam 2025</strong></p>
+                <p id="res-jam-d">قمت ببرمجة وتطوير نظام لعبة تفاعلية متكاملة تحت ضغط زمني مكثف في الجامعة الأردنية بالشراكة مع Dimensions Games Studio و Endless Access</p>
+                <br>
+                <p><strong id="res-atlas-t">تطويري لمنصة أطلس الإلكترونية ضمن مسابقة GJU 3030</strong></p>
+                <p id="res-atlas-d">قمت بتصميم وتطوير موقع إلكتروني تفاعلي للعبة واختباره واستضافته عبر منصة GitHub Pages على الرابط karamalsaudi.github.io/atlas-game</p>
+            </div>
+
+            <!-- GALLERY SECTION -->
+            <div class="glass-card">
+                <h2 id="res-proof-title">معرض شهاداتي وإثباتاتي الموثقة</h2>
+                <p id="res-proof-hint" style="font-size: 0.88rem;">يمكنك الضغط على أي شهادة لرؤيتها بحجمها الكامل المكبر</p>
+                <div class="gallery-grid">
+                    <div class="gallery-item" onclick="openLightbox('صورة 1.jpeg')">
+                        <img src="صورة 1.jpeg" alt="Game Jam Award" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <span style="display:none;">[ شهادة المركز الأول Game Jam ]</span>
+                    </div>
+
+                    <div class="gallery-item" onclick="openLightbox('صورة 2.jpeg')">
+                        <img src="صورة 2.jpeg" alt="Game Jam Award" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <span style="display:none;">[ شهادة المركز الأول Game Jam ]</span>
+                    </div>
+
+                    <div class="gallery-item" onclick="openLightbox('btec_cert.jpg')">
+                        <span id="g-btec">[ شهادة دبلوم بيرسون BTEC ]</span>
+                    </div>
+                    <div class="gallery-item" onclick="openLightbox('vocational_cert.jpg')">
+                        <span id="g-voc">[ شهادة ممارسة المهنة ]</span>
+                    </div>
+                    <div class="gallery-item" onclick="openLightbox('tawjihi_cert.jpg')">
+                        <span id="g-tawjihi">[ شهادة الثانوية العامة ]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox-modal" onclick="closeLightbox()">
+        <span class="close-lightbox">&times;</span>
+        <img id="lightbox-img" class="lightbox-content" src="" alt="Certificate Full View">
+    </div>
+
+    <!-- 3D Engine & Page Interactive Logic -->
+    <script>
+        // 1. INTENSIVE 3D THREE.JS BACKGROUND WITH GEOMETRIC OBJECTS & PARTICLES
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        // 3D Particles System
+        const count = 400;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(count * 3);
+        for(let i=0; i<count*3; i++) {
+            positions[i] = (Math.random() - 0.5) * 14;
+        }
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const material = new THREE.PointsMaterial({ size: 0.04, color: 0x06b6d4 });
+        const particles = new THREE.Points(geometry, material);
+        scene.add(particles);
+
+        // 3D Wireframe Box / Geometry Element
+        const boxGeo = new THREE.IcosahedronGeometry(1.4, 1);
+        const boxMat = new THREE.MeshBasicMaterial({ color: 0x2563eb, wireframe: true, transparent: true, opacity: 0.25 });
+        const boxMesh = new THREE.Mesh(boxGeo, boxMat);
+        boxMesh.position.set(2, 0, -1);
+        scene.add(boxMesh);
+
+        // 3D Grid Floor
+        const gridGeo = new THREE.PlaneGeometry(25, 25, 20, 20);
+        const gridMat = new THREE.MeshBasicMaterial({ color: 0x06b6d4, wireframe: true, transparent: true, opacity: 0.1 });
+        const gridMesh = new THREE.Mesh(gridGeo, gridMat);
+        gridMesh.rotation.x = -Math.PI / 2.3;
+        gridMesh.position.y = -2.5;
+        scene.add(gridMesh);
+
+        camera.position.z = 4.5;
+
+        // Interactive Mouse 3D Movement
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth - 0.5) * 0.8;
+            mouseY = (e.clientY / window.innerHeight - 0.5) * 0.8;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            particles.rotation.y += 0.0012;
+            boxMesh.rotation.x += 0.005;
+            boxMesh.rotation.y += 0.006;
+            gridMesh.rotation.z += 0.0008;
+
+            camera.position.x += (mouseX - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY - camera.position.y) * 0.05;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // 2. PAGE NAVIGATION
+        function switchPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-btn:not(.lang-btn)').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById('page-' + pageId).classList.add('active');
+            document.getElementById('btn-' + pageId).classList.add('active');
+        }
+
+        // 3. LIGHTBOX GALLERY
+        function openLightbox(src) {
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightbox-img');
+            img.src = src;
+            lightbox.classList.add('active');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+        }
+
+        // 4. DUAL LANGUAGE SYSTEM (Arabic Default)
+        let currentLang = 'ar';
+
+        const translations = {
+            ar: {
+                cvNav: "الـ CV التفصيلي",
+                resNav: "السيرة الذاتية (Resume)",
+                langBtn: "English",
+                cvName: "كرم علي فاروق السعودي",
+                cvTitle: "أخصائي دعم فني وتطوير ويب وخريج تقنية معلومات متقدم",
+                cvExpTitle: "الخبرات الشاملة والتأهيل الأكاديمي والتقني الخاص بي",
+                cvExpBody: "أنا كرم السعودي أمتلك خلفية علمية وتقنية متقدمة تم بناء وتطوير خبراتي فيها من خلال مسار دبلوم بيرسون BTEC الدولي بنجاح متميز وبمعدل 83.80 بالمئة مع حصولي على العلامة الكاملة 100 بالمئة في معظم المواد التخصصية المعقدة لقد قمت بتعزيز معرفتي العملية في مجالات الأمن السيبراني البرمجة تطوير الألعاب الدعم الفني إدارة المشاريع الذكاء الاصطناعي وتطوير المواقع وتكللت هذه المسيرة الشغوفة بفضله تعالى بتحقيقي المركز الأول على مستوى المملكة الأردنية الهاشمية في مسابقة تطوير الألعاب Godot Game Jam لعام 2025 مما يبرهن قدرتي العالية على ابتكار الحلول البرمجية والعمل تحت الضغط وإدارة المنطق البرمجي بكفاءة متناهية",
+                cvSkillsTitle: "قدراتي ومهاراتي التقنية المتقدمة",
+                sk1T: "الدعم الفني والأنظمة", sk1D: "أمتلك مهارة عالية في تشخيص وإصلاح مشاكل العتاد والبرمجيات وإدارة شبكات الاتصال وضمان مطابقة الأنظمة لبيئات ITSM",
+                sk2T: "الأمن السيبراني والحوكمة", sk2D: "أجيد التعامل مع الحوادث الأمنية وفهم مبادئ التشفير والحماية المتقدمة وتطبيق معايير ISO 27001 وقواعد البيانات SQL",
+                sk3T: "البرمجة وتطوير الويب", sk3D: "أبرمج بثبات باستخدام لغات Python و JavaScript وأقوم ببناء واجهات تفاعلية جليلة بـ HTML5 و CSS3 مع معرفة بـ C++",
+                sk4T: "تطوير الألعاب وأدوات التحكم", sk4D: "أطور المنطق التفاعلي للألعاب على محرك Godot وأدير بيئات العمل البرمجية باستخدام Git و Visual Studio و GitHub Pages",
+                cvEduTitle: "سجلي الأكاديمي الموثق والدرجات التي حققتها",
+                cvEduBody: "حصلت على شهادة الدراسة الثانوية العامة مسار BTEC تقنية المعلومات من مدرسة رغدان الثانوية للبنين بمجموع كلي 838 من 1000",
+                cvUnitsTitle: "نتائجي التفصيلية في المواد المعتمدة",
+                cvUnitsList: "الأمن السيبراني وإدارة الحوادث 100 بالمئة | البرمجة 100 بالمئة | الدعم الفني وإدارة تقنية المعلومات 100 بالمئة | تطوير المواقع الإلكترونية 100 بالمئة | تطوير ألعاب الكمبيوتر 100 بالمئة | إدارة مشاريع تقنية المعلومات 100 بالمئة | مقدمة في الذكاء الاصطناعي 100 بالمئة | استراتيجية وبنية الأنظمة 80 بالمئة",
+                resName: "كرم علي فاروق السعودي",
+                resTitle: "مساعد عمليات تقنية المعلومات والبرمجيات",
+                resExecTitle: "ملفي التنفيذي المهني",
+                resExecText: "أنا خريج تقني متخصص ومؤهل بدبلوم بيرسون BTEC الدولي ومزود بإنجاز وطني حقيقي على مستوى المملكة الأردنية الهاشمية أحمل جاهزية كاملة لتقديم قيمة عملية فورية ومباشرة في مجالات الدعم الفني التشغيلي تطوير الويب وإدارة البنية التحتية التقنية أتمتع بفهم عميق لأطر العمل العالمية مثل إدارة خدمات تقنية المعلومات ITSM وقواعد حوكمة وأمن المعلومات وفق معايير ISO 27001 أملك الشغف الدائم لتطوير الأنظمة وإصلاح أعطالها المعقدة والمساهمة الفعالة في تحقيق أهداف فرق العمل البرمجية والتشغيلية",
+                resAchieveTitle: "إنجازاتي والمسابقات والمشاريع التي نفذتها",
+                resJamT: "حصولي على المركز الأول على مستوى المملكة في مسابقة Godot Game Jam 2025",
+                resJamD: "قمت ببرمجة وتطوير نظام لعبة تفاعلية متكاملة تحت ضغط زمني مكثف في الجامعة الأردنية بالشراكة مع Dimensions Games Studio و Endless Access",
+                resAtlasT: "تطويري لمنصة أطلس الإلكترونية ضمن مسابقة GJU 3030",
+                resAtlasD: "قمت بتصميم وتطوير موقع إلكتروني تفاعلي للعبة واختباره واستضافته عبر منصة GitHub Pages على الرابط karamalsaudi.github.io/atlas-game",
+                resProofTitle: "معرض شهاداتي وإثباتاتي الموثقة",
+                resProofHint: "يمكنك الضغط على أي شهادة لرؤيتها بحجمها الكامل المكبر",
+                gBtec: "[ شهادة دبلوم بيرسون BTEC ]",
+                gVoc: "[ شهادة ممارسة المهنة ]",
+                gTawjihi: "[ شهادة الثانوية العامة ]"
+            },
+            en: {
+                cvNav: "Detailed CV",
+                resNav: "Resume",
+                langBtn: "عربي",
+                cvName: "Karam Ali Farouq Al-Soudi",
+                cvTitle: "IT Support & Web Development Specialist | Advanced IT Graduate",
+                cvExpTitle: "My Comprehensive Experience Academic & Technical Qualification",
+                cvExpBody: "I am Karam Al-Soudi possessing an advanced scientific and technical background built through the Pearson BTEC International Diploma pathway with distinction achieving an 83.80 percent average alongside perfect 100 percent scores across core modules I expanded my hands-on expertise in Cybersecurity Programming Game Development Technical Support Project Management AI and Web Development This journey culminated in winning 1st Place nationally in Jordan at the Godot Game Jam 2025 competition proving my ability to innovate and deliver complex logic under strict deadlines",
+                cvSkillsTitle: "My Advanced Technical Capabilities",
+                sk1T: "IT Support & Infrastructure", sk1D: "I possess strong expertise in diagnosing hardware/software issues network management and maintaining ITSM framework alignment",
+                sk2T: "Cybersecurity & Governance", sk2D: "I manage security incidents apply encryption standards ensure ISO 27001 compliance and maintain SQL databases",
+                sk3T: "Programming & Web Dev", sk3D: "I develop cleanly in Python and JavaScript while building interactive interfaces using HTML5 CSS3 and C++ familiarity",
+                sk4T: "Game Dev & Tools", sk4D: "I program interactive game logic on Godot Engine while managing repositories via Git Visual Studio and GitHub Pages",
+                cvEduTitle: "My Verified Academic Transcript & Grades",
+                cvEduBody: "I achieved my General Secondary Education Certificate BTEC IT Pathway at Raghdan Secondary School for Boys with a total score of 838 out of 1000",
+                cvUnitsTitle: "My Detailed Module Grades",
+                cvUnitsList: "Cyber Security & Incident Mgmt 100 percent | Programming 100 percent | IT Tech Support 100 percent | Web Development 100 percent | Game Development 100 percent | IT Project Mgmt 100 percent | Intro to AI 100 percent | IT Systems 80 percent",
+                resName: "Karam Ali Farouq Al-Soudi",
+                resTitle: "Junior IT Operations & Software Associate",
+                resExecTitle: "My Executive Professional Profile",
+                resExecText: "I am a qualified IT graduate holding a Pearson BTEC International Diploma backed by a national 1st Place award in Jordan I hold full readiness to deliver immediate operational value across IT support web development and infrastructure management I hold deep alignment with ITSM frameworks and ISO 27001 security standards with a constant drive to solve complex technical challenges",
+                resAchieveTitle: "My Achievements Competitions & Projects",
+                resJamT: "My 1st Place Win National Godot Game Jam 2025",
+                resJamD: "I engineered and programmed full game mechanics under tight deadlines at The University of Jordan partnered with Dimensions Games Studio and Endless Access",
+                resAtlasT: "My Development of Atlas Web Platform GJU 3030 Competition",
+                resAtlasD: "I designed developed and deployed an interactive game website hosted live via GitHub Pages karamalsaudi.github.io/atlas-game",
+                resProofTitle: "My Verified Certificates Gallery",
+                resProofHint: "Click any certificate to expand to full size view",
+                gBtec: "[ Pearson BTEC Diploma Cert ]",
+                gVoc: "[ Vocational Practice Cert ]",
+                gTawjihi: "[ Secondary Education Cert ]"
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            const t = translations[currentLang];
+            
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            document.documentElement.lang = currentLang;
+
+            document.getElementById('btn-cv').innerText = t.cvNav;
+            document.getElementById('btn-resume').innerText = t.resNav;
+            document.getElementById('btn-lang').innerText = t.langBtn;
+
+            document.getElementById('cv-name').innerText = t.cvName;
+            document.getElementById('cv-title').innerText = t.cvTitle;
+            document.getElementById('cv-exp-title').innerText = t.cvExpTitle;
+            document.getElementById('cv-exp-body').innerText = t.cvExpBody;
+            document.getElementById('cv-skills-title').innerText = t.cvSkillsTitle;
+            document.getElementById('sk1-t').innerText = t.sk1T; document.getElementById('sk1-d').innerText = t.sk1D;
+            document.getElementById('sk2-t').innerText = t.sk2T; document.getElementById('sk2-d').innerText = t.sk2D;
+            document.getElementById('sk3-t').innerText = t.sk3T; document.getElementById('sk3-d').innerText = t.sk3D;
+            document.getElementById('sk4-t').innerText = t.sk4T; document.getElementById('sk4-d').innerText = t.sk4D;
+            document.getElementById('cv-edu-title').innerText = t.cvEduTitle;
+            document.getElementById('cv-edu-body').innerText = t.cvEduBody;
+            document.getElementById('cv-units-title').innerText = t.cvUnitsTitle;
+            document.getElementById('cv-units-list').innerText = t.cvUnitsList;
+
+            document.getElementById('res-name').innerText = t.resName;
+            document.getElementById('res-title').innerText = t.resTitle;
+            document.getElementById('res-exec-title').innerText = t.resExecTitle;
+            document.getElementById('res-exec-text').innerText = t.resExecText;
+            document.getElementById('res-achieve-title').innerText = t.resAchieveTitle;
+            document.getElementById('res-jam-t').innerText = t.resJamT;
+            document.getElementById('res-jam-d').innerText = t.resJamD;
+            document.getElementById('res-atlas-t').innerText = t.resAtlasT;
+            document.getElementById('res-atlas-d').innerText = t.resAtlasD;
+            document.getElementById('res-proof-title').innerText = t.resProofTitle;
+            document.getElementById('res-proof-hint').innerText = t.resProofHint;
+            document.getElementById('g-btec').innerText = t.gBtec;
+            document.getElementById('g-voc').innerText = t.gVoc;
+            document.getElementById('g-tawjihi').innerText = t.gTawjihi;
+        }
+    </script>
+</body>
+</html>
