@@ -472,104 +472,62 @@
 
 
 
-            <!-- GALLERY SECTION -->
+<!-- GALLERY SECTION -->
+<div class="glass-card">
+    <h2 id="res-proof-title">معرض شهاداتي وإثباتاتي الموثقة</h2>
+    <p id="res-proof-hint" style="font-size: 0.88rem;">يمكنك الضغط على أي شهادة لرؤيتها بحجمها الكامل المكبر</p>
 
-            <div class="glass-card">
+    <div class="gallery-grid">
 
-                <h2 id="res-proof-title">معرض شهاداتي وإثباتاتي الموثقة</h2>
-
-                <p id="res-proof-hint" style="font-size: 0.88rem;">يمكنك الضغط على أي شهادة لرؤيتها بحجمها الكامل المكبر</p>
-
-                <div class="gallery-grid">
-
-                    <div class="gallery-item" onclick="openLightbox('صورة 1.jpeg')">
-
-                        <img src="صورة 1.jpeg" alt="Game Jam Award" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-
-                        <span style="display:none;">[ شهادة المركز الأول Game Jam ]</span>
-
-                    </div>
-
-
-
-                    <div class="gallery-item" onclick="openLightbox('صورة 2.jpeg')">
-
-                        <img src="صورة 2.jpeg" alt="Game Jam Award" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-
-                        <span style="display:none;">[ شهادة المركز الأول Game Jam ]</span>
-
-                    </div>
-
-
-
-                    <div class="gallery-item" onclick="openLightbox('btec_cert.jpg')">
-
-                        <img src="Person LVL 2.jpeg" alt="LVL 2" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-
-                        <span id="g-btec">[  2شهادة دبلوم بيرسون BTEC ]</span>
-
-                    </div>
-
-
-
-                     <div class="gallery-item" onclick="openLightbox('btec_cert.jpg')">
-
-                         <img src="Person LVL 2 Diploma.jpeg" alt="Diploma 2" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-
-                        <span id="g-btec">[ 2  DIPLOMA شهادة دبلوم بيرسون BTEC ]</span>
-
-                    </div>
-
-
-
-                     <div class="gallery-item" onclick="openLightbox('btec_cert.jpg')">
-
-                         <img src="Person LVL 3.jpeg" alt="lvl 3" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-
-                        <span id="g-btec">[  3 شهادة دبلوم بيرسون BTEC ]</span>
-
-                    </div>
-
-
-
-                     <div class="gallery-item" onclick="openLightbox('btec_cert.jpg')">
-
-                         <img src="Person LVL 3 Diploma.jpeg" alt="Diploma 3" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-
-                        <span id="g-btec">[  3 DIPLOMa شهادة دبلوم بيرسون BTEC ]</span>
-
-                    </div>
-
-
-
-                    
-
-                    <div class="gallery-item" onclick="openLightbox('vocational_cert.jpg')">
-
-                        <img src="" alt="Certificate of Professional Practice" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-
-                        <span id="g-voc">[ شهادة ممارسة المهنة ]</span>
-
-                    </div>
-
-                    <div class="gallery-item" onclick="openLightbox('tawjihi_cert.jpg')">
-
-                        <img src="High School Diploma.jpeg" alt="High school" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-
-                        <span id="g-tawjihi">[ شهادة الثانوية العامة ]</span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
+        <!-- صور مسابقة Game Jam -->
+        <div class="gallery-item" onclick="openLightbox(this)">
+            <img src="صورة 1.jpeg" alt="Game Jam Award" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <span style="display:none;">[ شهادة المركز الأول Game Jam ]</span>
         </div>
 
+        <div class="gallery-item" onclick="openLightbox(this)">
+            <img src="صورة 2.jpeg" alt="Game Jam Award" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <span style="display:none;">[ شهادة المركز الأول Game Jam ]</span>
+        </div>
 
+        <!-- شهادة BTEC Level 2 Performance -->
+        <div class="gallery-item" onclick="openLightbox(this)">
+            <img src="Person LVL 2.jpeg" alt="LVL 2" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <span id="g-btec-lvl2-perf">[ كشف علامات BTEC المستوى الثاني ]</span>
+        </div>
+
+        <!-- شهادة BTEC Level 2 Diploma -->
+        <div class="gallery-item" onclick="openLightbox(this)">
+            <img src="Person LVL 2 Diploma.jpeg" alt="Diploma 2" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <span id="g-btec-lvl2-dip">[ شهادة بيرسون BTEC المستوى الثاني ]</span>
+        </div>
+
+        <!-- شهادة BTEC Level 3 Performance -->
+        <div class="gallery-item" onclick="openLightbox(this)">
+            <img src="Person LVL 3.jpeg" alt="lvl 3" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <span id="g-btec-lvl3-perf">[ كشف علامات BTEC المستوى الثالث ]</span>
+        </div>
+
+        <!-- شهادة BTEC Level 3 Diploma -->
+        <div class="gallery-item" onclick="openLightbox(this)">
+            <img src="Person LVL 3 Diploma.jpeg" alt="Diploma 3" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <span id="g-btec-lvl3-dip">[ شهادة بيرسون BTEC المستوى الثالث ]</span>
+        </div>
+
+        <!-- شهادة ممارسة المهنة -->
+        <div class="gallery-item" onclick="openLightbox(this)">
+            <img src="" alt="Certificate of Professional Practice" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <span id="g-voc">[ شهادة ممارسة المهنة ]</span>
+        </div>
+
+        <!-- شهادة الثانوية العامة -->
+        <div class="gallery-item" onclick="openLightbox(this)">
+            <img src="High School Diploma.jpeg" alt="High school" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <span id="g-tawjihi">[ شهادة الثانوية العامة ]</span>
+        </div>
 
     </div>
-
+</div>
 
     <!-- Lightbox Modal -->
     <div id="lightbox" class="lightbox-modal" onclick="closeLightbox()">
@@ -652,15 +610,18 @@
         }
 
         // 3. LIGHTBOX GALLERY
-        // الكود الجديد والمعدل:
-function openLightbox(src) {
+function openLightbox(element) {
     const lightbox = document.getElementById('lightbox');
     const img = document.getElementById('lightbox-img');
     
-    img.src = encodeURI(src);
+    if (typeof element === 'object') {
+        img.src = element.querySelector('img').src;
+    } else {
+        img.src = encodeURI(element);
+    }
+    
     lightbox.classList.add('active');
-}
-        function closeLightbox() {
+}        function closeLightbox() {
             document.getElementById('lightbox').classList.remove('active');
         }
 
