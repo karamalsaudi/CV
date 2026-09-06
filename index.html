@@ -652,13 +652,14 @@
         }
 
         // 3. LIGHTBOX GALLERY
-        function openLightbox(src) {
-            const lightbox = document.getElementById('lightbox');
-            const img = document.getElementById('lightbox-img');
-            img.src = src;
-            lightbox.classList.add('active');
-        }
-
+        // الكود الجديد والمعدل:
+function openLightbox(src) {
+    const lightbox = document.getElementById('lightbox');
+    const img = document.getElementById('lightbox-img');
+    
+    img.src = encodeURI(src);
+    lightbox.classList.add('active');
+}
         function closeLightbox() {
             document.getElementById('lightbox').classList.remove('active');
         }
